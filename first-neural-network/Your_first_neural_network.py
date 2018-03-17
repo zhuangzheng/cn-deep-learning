@@ -133,7 +133,7 @@ val_features, val_targets = features[-60*24:], targets[-60*24:]
 # 
 #   
 
-# In[124]:
+# In[9]:
 
 
 class NeuralNetwork(object):
@@ -232,7 +232,7 @@ class NeuralNetwork(object):
         return final_outputs
 
 
-# In[125]:
+# In[10]:
 
 
 def MSE(y, Y):
@@ -243,7 +243,7 @@ def MSE(y, Y):
 # 
 # 运行这些单元测试，检查你的网络实现是否正确。这样可以帮助你确保网络已正确实现，然后再开始训练网络。这些测试必须成功才能通过此项目。
 
-# In[126]:
+# In[11]:
 
 
 import unittest
@@ -326,15 +326,15 @@ unittest.TextTestRunner().run(suite)
 # 
 # 隐藏节点越多，模型的预测结果就越准确。尝试不同的隐藏节点的数量，看看对性能有何影响。你可以查看损失字典，寻找网络性能指标。如果隐藏单元的数量太少，那么模型就没有足够的空间进行学习，如果太多，则学习方向就有太多的选择。选择隐藏单元数量的技巧在于找到合适的平衡点。
 
-# In[127]:
+# In[68]:
 
 
 import sys
 
 ### Set the hyperparameters here ###
-iterations = 100
-learning_rate = 0.1
-hidden_nodes = 2
+iterations = 2000
+learning_rate = 0.7
+hidden_nodes = 15
 output_nodes = 1
 
 N_i = train_features.shape[1]
@@ -344,7 +344,7 @@ losses = {'train':[], 'validation':[]}
 for ii in range(iterations):
     # Go through a random batch of 128 records from the training data set
     batch = np.random.choice(train_features.index, size=128)
-    X, y = train_features.ix[batch].values, train_targets.ix[batch]['cnt']
+    X, y = train_features.ix[batch].values, train_targets.iloc[batch]['cnt']
                              
     network.train(X, y)
     
@@ -358,7 +358,7 @@ for ii in range(iterations):
     losses['validation'].append(val_loss)
 
 
-# In[128]:
+# In[69]:
 
 
 plt.plot(losses['train'], label='Training loss')
@@ -371,7 +371,7 @@ _ = plt.ylim()
 # 
 # 使用测试数据看看网络对数据建模的效果如何。如果完全错了，请确保网络中的每步都正确实现。
 
-# In[129]:
+# In[70]:
 
 
 fig, ax = plt.subplots(figsize=(8,4))
@@ -397,4 +397,6 @@ _ = ax.set_xticklabels(dates[12::24], rotation=45)
 # > **注意**：你可以通过双击该单元编辑文本。如果想要预览文本，请按 Control + Enter
 # 
 # #### 请将你的答案填写在下方
-# 
+# 到12月21日之前预测效果都很好，但是在这之后就不稳定了，特别是圣诞节期间，严重高估了骑车用户数。
+# 猜测的原因是圣诞节到新年期间本来就比较特殊，骑车人数与其他时间有较大差异，但是主要原因应该是样本较少，在此之前只有2011年的年末数据
+# 可以学习，如果情况不特殊还好预测（测试集前半段），但是遇到了特殊情况（如重大节日），而样本又少，就容易预测出现较大偏差。
