@@ -60,7 +60,7 @@
 # - `train_targets`, `valid_targets`, `test_targets` - 包含独热编码分类标签的numpy数组
 # - `dog_names` - 由字符串构成的与标签相对应的狗的种类
 
-# In[3]:
+# In[1]:
 
 from sklearn.datasets import load_files       
 from keras.utils import np_utils
@@ -94,7 +94,7 @@ print('There are %d test dog images.'% len(test_files))
 # 
 # 在下方的代码单元中，我们导入人脸图像数据集，文件所在路径存储在名为 `human_files` 的 numpy 数组。
 
-# In[4]:
+# In[2]:
 
 import random
 random.seed(8675309)
@@ -115,7 +115,7 @@ print('There are %d total human images.' % len(human_files))
 # 
 # 在如下代码单元中，我们将演示如何使用这个检测模型在样本图像中找到人脸。
 
-# In[5]:
+# In[3]:
 
 import cv2                
 import matplotlib.pyplot as plt                        
@@ -157,7 +157,7 @@ plt.show()
 # 
 # 我们可以将这个程序封装为一个函数。该函数的输入为人脸图像的**路径**，当图像中包含人脸时，该函数返回 `True`，反之返回 `False`。该函数定义如下所示。
 
-# In[6]:
+# In[4]:
 
 # 如果img_path路径表示的图像检测到了脸，返回"True" 
 def face_detector(img_path):
@@ -182,22 +182,17 @@ def face_detector(img_path):
 # 
 # 理想情况下，人图像中检测到人脸的概率应当为100%，而狗图像中检测到人脸的概率应该为0%。你会发现我们的算法并非完美，但结果仍然是可以接受的。我们从每个数据集中提取前100个图像的文件路径，并将它们存储在`human_files_short`和`dog_files_short`中。
 
-# In[7]:
+# In[5]:
 
 human_files_short = human_files[:100]
 dog_files_short = train_files[:100]
 ## 请不要修改上方代码
-num_human = []
-num_wronghuman=[]
-for n in range(100):
-    num_human.append(face_detector(human_files_short[n]))
-    num_wronghuman.append(face_detector(dog_files_short[n]))
-    
-human_acc = np.sum(num_human > np.zeros(100)) / len(num_human) * 100
-wronghuman_acc = np.sum(num_wronghuman > np.zeros(100))/len(num_wronghuman) * 100
+num_human = [face_detector(f) for f in human_files_short]
+num_dog =[face_detector(f) for f in dog_files_short]
 
-print("100张人脸被检测出的概率为:  ",human_acc)
-print("100张狗被检测出人脸的概率为:  ",wronghuman_acc)
+
+print("100张人脸被检测出人脸的概率为:  {:.2%}".format(np.sum(num_human) / len(num_human)))
+print("100张狗狗被误检出人脸的概率为:  {:.2%}".format(np.sum(num_dog) / len(num_dog)))
 ## TODO: 基于human_files_short和dog_files_short
 ## 中的图像测试face_detector的表现
 
@@ -241,7 +236,7 @@ print("100张狗被检测出人脸的概率为:  ",wronghuman_acc)
 # 
 # ImageNet 这目前一个非常流行的数据集，常被用来测试图像分类等计算机视觉任务相关的算法。它包含超过一千万个 URL，每一个都链接到 [1000 categories](https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a) 中所对应的一个物体的图像。任给输入一个图像，该 ResNet-50 模型会返回一个对图像中物体的预测结果。
 
-# In[9]:
+# In[6]:
 
 from keras.applications.resnet50 import ResNet50
 
@@ -262,7 +257,7 @@ ResNet50_model = ResNet50(weights='imagenet')
 # 
 # - `paths_to_tensor` 函数将图像路径的字符串组成的 numpy 数组作为输入，并返回一个4维张量，各维度尺寸为 `(nb_samples, 224, 224, 3)`。 在这里，`nb_samples`是提供的图像路径的数据中的样本数量或图像数量。你也可以将 `nb_samples` 理解为数据集中3维张量的个数（每个3维张量表示一个不同的图像。
 
-# In[10]:
+# In[7]:
 
 from keras.preprocessing import image                  
 from tqdm import tqdm
@@ -294,7 +289,7 @@ def paths_to_tensor(img_paths):
 # 通过对预测出的向量取用 argmax 函数（找到有最大概率值的下标序号），我们可以得到一个整数，即模型预测到的物体的类别。进而根据这个 [清单](https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a)，我们能够知道这具体是哪个品种的狗狗。
 # 
 
-# In[11]:
+# In[8]:
 
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 def ResNet50_predict_labels(img_path):
@@ -310,7 +305,7 @@ def ResNet50_predict_labels(img_path):
 # 
 # 我们通过这些想法来完成下方的 `dog_detector` 函数，如果从图像中检测到狗就返回 `True`，否则返回 `False`。
 
-# In[12]:
+# In[9]:
 
 def dog_detector(img_path):
     prediction = ResNet50_predict_labels(img_path)
@@ -329,16 +324,16 @@ def dog_detector(img_path):
 # - `human_files_short`中图像检测到狗狗的百分比？
 # - `dog_files_short`中图像检测到狗狗的百分比？
 
-# In[15]:
+# In[10]:
 
 ### TODO: 测试dog_detector函数在human_files_short和dog_files_short的表现
 
-num_human = [face_detector(f) for f in human_files_short]
-num_dog =[face_detector(f) for f in dog_files_short]
+num_human = [dog_detector(f) for f in human_files_short]
+num_dog =[dog_detector(f) for f in dog_files_short]
 
 
-print("100张人脸被检测出的概率为:  {:.2%}".format(np.sum(num_human) / len(num_human)))
-print("100张人脸被检测出的概率为:  {:.2%}".format(np.sum(num_dog) / len(num_dog)))
+print("100张人脸被误检出狗狗的概率为:  {:.2%}".format(np.sum(num_human) / len(num_human)))
+print("100张狗狗被检测出狗狗的概率为:  {:.2%}".format(np.sum(num_dog) / len(num_dog)))
 
 
 # ---
