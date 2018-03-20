@@ -4,7 +4,7 @@
 [image2]: ./images/vgg16_model.png "VGG-16 Model Keras Layers"
 [image3]: ./images/vgg16_model_draw.png "VGG16 Model Figure"
 
-# 这是我在udacity的一个卷积神经网络项目 细节见[这里](https://github.com/zhuangzheng/cn-deep-learning/edit/master/dog-project/dog-project.ipynb) 
+# 这是我在udacity的一个卷积神经网络项目 细节见[这里](https://github.com/zhuangzheng/cn-deep-learning/edit/master/dog-project/dog_app.ipynb) 
 _以下是原项目README_
 
 ## 项目概述
